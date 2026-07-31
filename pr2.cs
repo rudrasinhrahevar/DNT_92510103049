@@ -1,219 +1,119 @@
 using System;
-using System.Collections.Generic;
 
-namespace PayrollSystem
+interface IPayroll
 {
-    // Interface for Payroll Calculation
-    interface IPayroll
+    void CalculateSalary();
+}
+
+class Employee
+{
+    protected int empId;
+    protected string name;
+
+    public Employee()
     {
-        double CalculateNetSalary();
-        void DisplayPaySlip();
+        Console.WriteLine("Employee Payroll System\n");
     }
 
-    // Base Abstract Class: Employee
-    abstract class Employee : IPayroll
+    public void GetDetails()
     {
-        public int EmpId { get; set; }
-        public string Name { get; set; }
-        public string Department { get; set; }
+        Console.Write("Enter Employee ID: ");
+        empId = Convert.ToInt32(Console.ReadLine());
 
-        public Employee(int id, string name, string dept)
-        {
-            EmpId = id;
-            Name = name ?? "";
-            Department = dept ?? "";
-        }
-
-        public abstract double CalculateNetSalary();
-
-        public virtual void DisplayPaySlip()
-        {
-            Console.WriteLine($"\n========================================");
-            Console.WriteLine($"           EMPLOYEE PAYSLIP             ");
-            Console.WriteLine($"========================================");
-            Console.WriteLine($"Employee ID   : {EmpId}");
-            Console.WriteLine($"Employee Name : {Name}");
-            Console.WriteLine($"Department    : {Department}");
-        }
+        Console.Write("Enter Employee Name: ");
+        name = Console.ReadLine();
     }
 
-    // Derived Class 1: Full-Time Employee (Inheritance & Polymorphism)
-    class FullTimeEmployee : Employee
+    public virtual void Display()
     {
-        public double BasicSalary { get; set; }
-        public double HRA => BasicSalary * 0.20; // 20% HRA
-        public double DA => BasicSalary * 0.10;  // 10% DA
-        public double PF => BasicSalary * 0.12;  // 12% PF Deduction
+        Console.WriteLine("\nEmployee ID: " + empId);
+        Console.WriteLine("Employee Name: " + name);
+    }
+}
 
-        public FullTimeEmployee(int id, string name, string dept, double basicSalary)
-            : base(id, name, dept)
-        {
-            BasicSalary = basicSalary;
-        }
+class FullTimeEmployee : Employee, IPayroll
+{
+    private double basicSalary;
+    private double netSalary;
 
-        public override double CalculateNetSalary()
-        {
-            return BasicSalary + HRA + DA - PF;
-        }
-
-        public override void DisplayPaySlip()
-        {
-            base.DisplayPaySlip();
-            Console.WriteLine($"Employment    : Full-Time Employee");
-            Console.WriteLine($"Basic Salary  : ₹{BasicSalary:F2}");
-            Console.WriteLine($"HRA (+20%)    : ₹{HRA:F2}");
-            Console.WriteLine($"DA (+10%)     : ₹{DA:F2}");
-            Console.WriteLine($"PF Deduct(-12%: ₹{PF:F2}");
-            Console.WriteLine($"----------------------------------------");
-            Console.WriteLine($"Net Salary    : ₹{CalculateNetSalary():F2}");
-            Console.WriteLine($"========================================\n");
-        }
+    public void GetSalary()
+    {
+        Console.Write("Enter Basic Salary: ");
+        basicSalary = Convert.ToDouble(Console.ReadLine());
     }
 
-    // Derived Class 2: Part-Time Employee (Inheritance & Polymorphism)
-    class PartTimeEmployee : Employee
+    public void CalculateSalary()
     {
-        public double HourlyRate { get; set; }
-        public int HoursWorked { get; set; }
-
-        public PartTimeEmployee(int id, string name, string dept, double hourlyRate, int hoursWorked)
-            : base(id, name, dept)
-        {
-            HourlyRate = hourlyRate;
-            HoursWorked = hoursWorked;
-        }
-
-        public override double CalculateNetSalary()
-        {
-            return HourlyRate * HoursWorked;
-        }
-
-        public override void DisplayPaySlip()
-        {
-            base.DisplayPaySlip();
-            Console.WriteLine($"Employment    : Part-Time Employee");
-            Console.WriteLine($"Hourly Rate   : ₹{HourlyRate:F2}");
-            Console.WriteLine($"Hours Worked  : {HoursWorked} hrs");
-            Console.WriteLine($"----------------------------------------");
-            Console.WriteLine($"Net Salary    : ₹{CalculateNetSalary():F2}");
-            Console.WriteLine($"========================================\n");
-        }
+        netSalary = basicSalary + (basicSalary * 0.20);
     }
 
-    // Derived Class 3: Contract Employee (Inheritance & Polymorphism)
-    class ContractEmployee : Employee
+    public override void Display()
     {
-        public double ContractAmount { get; set; }
-        public double TaxDeduction => ContractAmount * 0.05; // 5% Tax
+        base.Display();
+        Console.WriteLine("Employee Type: Full Time");
+        Console.WriteLine("Net Salary: " + netSalary);
+    }
+}
 
-        public ContractEmployee(int id, string name, string dept, double contractAmount)
-            : base(id, name, dept)
-        {
-            ContractAmount = contractAmount;
-        }
+class PartTimeEmployee : Employee, IPayroll
+{
+    private int hours;
+    private double rate;
+    private double salary;
 
-        public override double CalculateNetSalary()
-        {
-            return ContractAmount - TaxDeduction;
-        }
+    public void GetSalary()
+    {
+        Console.Write("Enter Working Hours: ");
+        hours = Convert.ToInt32(Console.ReadLine());
 
-        public override void DisplayPaySlip()
-        {
-            base.DisplayPaySlip();
-            Console.WriteLine($"Employment    : Contract Employee");
-            Console.WriteLine($"Contract Amt  : ₹{ContractAmount:F2}");
-            Console.WriteLine($"Tax Deduct(-5%): ₹{TaxDeduction:F2}");
-            Console.WriteLine($"----------------------------------------");
-            Console.WriteLine($"Net Salary    : ₹{CalculateNetSalary():F2}");
-            Console.WriteLine($"========================================\n");
-        }
+        Console.Write("Enter Hourly Rate: ");
+        rate = Convert.ToDouble(Console.ReadLine());
     }
 
-    class Program
+    public void CalculateSalary()
     {
-        static void Main()
+        salary = hours * rate;
+    }
+
+    public override void Display()
+    {
+        base.Display();
+        Console.WriteLine("Employee Type: Part Time");
+        Console.WriteLine("Salary: " + salary);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("1. Full Time Employee");
+        Console.WriteLine("2. Part Time Employee");
+
+        Console.Write("Enter Choice: ");
+        int choice = Convert.ToInt32(Console.ReadLine());
+
+        Employee emp;
+
+        if (choice == 1)
         {
-            Console.WriteLine("===== EMPLOYEE PAYROLL MANAGEMENT SYSTEM =====\n");
-
-            List<IPayroll> payrollList = new List<IPayroll>();
-
-            while (true)
-            {
-                Console.WriteLine("1. Add Full-Time Employee");
-                Console.WriteLine("2. Add Part-Time Employee");
-                Console.WriteLine("3. Add Contract Employee");
-                Console.WriteLine("4. Display All Pay Slips (Polymorphic Processing)");
-                Console.WriteLine("5. Exit");
-                Console.Write("Enter your choice (1-5): ");
-
-                string choice = Console.ReadLine() ?? "";
-
-                if (choice == "5") break;
-
-                if (choice == "4")
-                {
-                    if (payrollList.Count == 0)
-                    {
-                        Console.WriteLine("\nNo employee records found.\n");
-                        continue;
-                    }
-
-                    Console.WriteLine("\n========================================");
-                    Console.WriteLine("     PROCESSING PAYROLL POLYMORPHICALLY   ");
-                    Console.WriteLine("========================================");
-
-                    foreach (IPayroll emp in payrollList)
-                    {
-                        // Polymorphic method invocation via Interface
-                        emp.DisplayPaySlip();
-                    }
-                    continue;
-                }
-
-                Console.Write("Enter Employee ID: ");
-                int.TryParse(Console.ReadLine(), out int id);
-
-                Console.Write("Enter Employee Name: ");
-                string name = Console.ReadLine() ?? "";
-
-                Console.Write("Enter Department: ");
-                string dept = Console.ReadLine() ?? "";
-
-                switch (choice)
-                {
-                    case "1":
-                        Console.Write("Enter Monthly Basic Salary: ");
-                        double.TryParse(Console.ReadLine(), out double basic);
-                        payrollList.Add(new FullTimeEmployee(id, name, dept, basic));
-                        Console.WriteLine("Full-Time Employee added successfully!\n");
-                        break;
-
-                    case "2":
-                        Console.Write("Enter Hourly Rate: ");
-                        double.TryParse(Console.ReadLine(), out double rate);
-                        Console.Write("Enter Hours Worked: ");
-                        int.TryParse(Console.ReadLine(), out int hours);
-                        payrollList.Add(new PartTimeEmployee(id, name, dept, rate, hours));
-                        Console.WriteLine("Part-Time Employee added successfully!\n");
-                        break;
-
-                    case "3":
-                        Console.Write("Enter Total Contract Amount: ");
-                        double.TryParse(Console.ReadLine(), out double contract);
-                        payrollList.Add(new ContractEmployee(id, name, dept, contract));
-                        Console.WriteLine("Contract Employee added successfully!\n");
-                        break;
-
-                    default:
-                        Console.WriteLine("Invalid option. Please try again.\n");
-                        break;
-                }
-            }
-
-            if (!Console.IsInputRedirected)
-            {
-                Console.ReadKey();
-            }
+            FullTimeEmployee ft = new FullTimeEmployee();
+            ft.GetDetails();
+            ft.GetSalary();
+            ft.CalculateSalary();
+            emp = ft;
         }
+        else
+        {
+            PartTimeEmployee pt = new PartTimeEmployee();
+            pt.GetDetails();
+            pt.GetSalary();
+            pt.CalculateSalary();
+            emp = pt;
+        }
+
+        emp.Display();
+
+        Console.ReadKey();
     }
 }
