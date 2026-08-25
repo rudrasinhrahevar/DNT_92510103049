@@ -1,0 +1,110 @@
+﻿@model EventRegistrationPortal.Models.EventRegistration
+@{
+    ViewData["Title"] = "Dancing Event Registration";
+}
+
+<section class="form-card">
+    <div class="card-header-block">
+        <p class="eyebrow">Dancing Event</p>
+        <h1>Registration Form</h1>
+        <p class="intro-text">Complete your details to reserve your spot.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success success-banner" role="alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <form asp-action="Index" method="post" class="registration-form" novalidate>
+        <div asp-validation-summary="ModelOnly" class="text-danger validation-summary mb-3"></div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ConfirmEmail" class="form-label"></label>
+                <input asp-for="ConfirmEmail" class="form-control" />
+                <span asp-validation-for="ConfirmEmail" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="PhoneNumber" class="form-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="Age" class="form-label"></label>
+                <input asp-for="Age" class="form-control" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="Gender" class="form-label"></label>
+                <select asp-for="Gender" class="form-select">
+                    <option value="">-- Select --</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="DanceStyle" class="form-label"></label>
+                <select asp-for="DanceStyle" class="form-select">
+                    <option value="">-- Select --</option>
+                    <option value="Hip Hop">Hip Hop</option>
+                    <option value="Ballet">Ballet</option>
+                    <option value="Contemporary">Contemporary</option>
+                    <option value="Salsa">Salsa</option>
+                    <option value="Bollywood">Bollywood</option>
+                </select>
+                <span asp-validation-for="DanceStyle" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="NumberOfTickets" class="form-label"></label>
+                <input asp-for="NumberOfTickets" class="form-control" />
+                <span asp-validation-for="NumberOfTickets" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="EventDate" class="form-label"></label>
+                <input asp-for="EventDate" class="form-control" type="date" />
+                <span asp-validation-for="EventDate" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <div class="terms-box mt-4">
+                    <div class="form-check">
+                        <input asp-for="TermsAccepted" class="form-check-input" />
+                        <label asp-for="TermsAccepted" class="form-check-label"></label>
+                    </div>
+                    <span asp-validation-for="TermsAccepted" class="text-danger d-block"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-register">Register Now</button>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
