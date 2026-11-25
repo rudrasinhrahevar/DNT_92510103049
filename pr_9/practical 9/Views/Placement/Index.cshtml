@@ -1,0 +1,153 @@
+@model PlacementDashboardViewModel
+@{
+    ViewData["Title"] = "Placement dashboard";
+    var rate = Model.TotalStudents == 0 ? 0 : (int)Math.Round(Model.PlacedStudents * 100d / Model.TotalStudents);
+}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow"><span class="eyebrow-dot"></span> CAREER SERVICES / OVERVIEW</div>
+        <h1>Every next step, <span>in one place.</span></h1>
+        <p>A live view of student outcomes, hiring activity, and the teams shaping your next graduating class.</p>
+    </div>
+    <div class="heading-actions">
+        <a class="button button-light" asp-action="Report" asp-route-search="@Model.Search" asp-route-status="@Model.Status" asp-route-department="@Model.Department"><span class="button-icon">▤</span> View report</a>
+        <a class="button button-dark" asp-action="ExportCsv" asp-route-search="@Model.Search" asp-route-status="@Model.Status" asp-route-department="@Model.Department"><span class="button-icon">↓</span> Export data</a>
+    </div>
+</section>
+
+<section class="stats-grid" aria-label="Placement summary">
+    <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon icon-lilac">◎</span><span class="stat-caption">STUDENTS TRACKED</span></div>
+        <strong>@Model.TotalStudents</strong>
+        <span class="stat-description">in the graduating cohort</span>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon icon-green">↗</span><span class="stat-caption">SUCCESSFULLY PLACED</span></div>
+        <strong>@Model.PlacedStudents <small class="metric-note">/ @Model.TotalStudents</small></strong>
+        <span class="stat-description">@rate% placement rate</span>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon icon-blue">✳</span><span class="stat-caption">OFFERS IN HAND</span></div>
+        <strong>@Model.OfferCount</strong>
+        <span class="stat-description">placed or offer received</span>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon icon-amber">₹</span><span class="stat-caption">AVERAGE PACKAGE</span></div>
+        <strong>₹@Model.AverageCtcLpa.ToString("0.0") <small class="metric-note">LPA</small></strong>
+        <span class="stat-description">among placed students</span>
+    </article>
+</section>
+
+<section class="insights-grid" aria-label="Placement insights">
+    <article class="insight-card">
+        <div class="card-heading">
+            <div><div class="eyebrow">PLACEMENT RATE</div><h2>Progress by department</h2></div>
+            <span class="legend"><i></i> Placed</span>
+        </div>
+        <div class="department-list">
+            @foreach (var department in Model.Departments)
+            {
+                <div class="department-row">
+                    <div class="department-meta"><span>@department.Name</span><strong>@department.PlacedCount <small>/ @department.StudentCount</small></strong></div>
+                    <div class="progress-track" role="progressbar" aria-label="@department.Name placement rate" aria-valuenow="@department.PlacementRate" aria-valuemin="0" aria-valuemax="100">
+                        <span style="width: @department.PlacementRate%"></span>
+                    </div>
+                </div>
+            }
+        </div>
+    </article>
+    <article class="insight-card pipeline-card">
+        <div class="card-heading">
+            <div><div class="eyebrow">HIRING PIPELINE</div><h2>Where things stand</h2></div>
+            <span class="live-dot">Live</span>
+        </div>
+        <div class="pipeline-chart" aria-label="Placement pipeline by status">
+            <div class="pipeline-bar bar-placed" style="height: @(Model.TotalStudents == 0 ? 0 : Math.Max(10, Model.PlacedStudents * 100 / Model.TotalStudents))%">
+                <span>@Model.PlacedStudents</span>
+            </div>
+            <div class="pipeline-bar bar-offer" style="height: @(Model.TotalStudents == 0 ? 0 : Math.Max(10, Model.OfferReceivedCount * 100 / Model.TotalStudents))%">
+                <span>@Model.OfferReceivedCount</span>
+            </div>
+            <div class="pipeline-bar bar-interview" style="height: @(Model.TotalStudents == 0 ? 0 : Math.Max(10, Model.InterviewingCount * 100 / Model.TotalStudents))%">
+                <span>@Model.InterviewingCount</span>
+            </div>
+            <div class="pipeline-bar bar-applied" style="height: @(Model.TotalStudents == 0 ? 0 : Math.Max(10, Model.AppliedCount * 100 / Model.TotalStudents))%">
+                <span>@Model.AppliedCount</span>
+            </div>
+        </div>
+        <div class="pipeline-labels"><span>Placed</span><span>Offer</span><span>Interview</span><span>Applied</span></div>
+        <div class="pipeline-foot"><span><i class="legend-placed"></i> Hired</span><span><i class="legend-progress"></i> In progress</span></div>
+    </article>
+</section>
+
+<section class="records-section">
+    <div class="section-heading">
+        <div>
+            <div class="eyebrow">STUDENT RECORDS</div>
+            <h2>Placement activity <span class="count">@Model.FilteredCount</span></h2>
+        </div>
+        <form class="filter-form" asp-action="Index" method="get">
+            <label class="search-control">
+                <span class="sr-only">Search students, companies, and roles</span>
+                <span class="search-symbol" aria-hidden="true">⌕</span>
+                <input type="search" name="search" value="@Model.Search" placeholder="Search students, companies..." />
+            </label>
+            <label>
+                <span class="sr-only">Filter by department</span>
+                <select name="department" aria-label="Filter by department">
+                    <option value="">All departments</option>
+                    @foreach (var department in Model.DepartmentOptions)
+                    {
+                        <option value="@department" selected="@(Model.Department == department)">@department</option>
+                    }
+                </select>
+            </label>
+            <label>
+                <span class="sr-only">Filter by status</span>
+                <select name="status" aria-label="Filter by status">
+                    <option value="">All statuses</option>
+                    @foreach (var status in Model.StatusOptions)
+                    {
+                        <option value="@status" selected="@(Model.Status == status)">@status</option>
+                    }
+                </select>
+            </label>
+            <button class="filter-submit" type="submit">Apply</button>
+            @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.Status) || !string.IsNullOrWhiteSpace(Model.Department))
+            {
+                <a class="clear-filters" asp-action="Index">Clear</a>
+            }
+        </form>
+    </div>
+
+    @if (Model.Placements.Count > 0)
+    {
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>STUDENT</th><th>DEPARTMENT</th><th>COMPANY &amp; ROLE</th><th>PACKAGE</th><th>STATUS</th><th>UPDATED</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var placement in Model.Placements)
+                    {
+                        var statusClass = placement.Status.ToLowerInvariant().Replace(' ', '-');
+                        <tr>
+                            <td><div class="student-cell"><span class="avatar">@placement.StudentName[0]</span><span><strong>@placement.StudentName</strong><small>@placement.StudentId</small></span></div></td>
+                            <td><span class="department-pill">@placement.Department</span></td>
+                            <td><span class="company-name">@placement.Company</span><small class="role-name">@placement.Role</small></td>
+                            <td class="package">@(placement.CtcLpa is decimal ctc ? $"₹{ctc:0.0} LPA" : "—")</td>
+                            <td><span class="status-badge @statusClass"><i></i>@placement.Status</span></td>
+                            <td class="updated-date">@placement.UpdatedAt.ToString("dd MMM yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state"><span class="empty-mark">⌕</span><h3>No matching students</h3><p>Try changing your search or clearing one of the filters.</p><a class="button button-light" asp-action="Index">Clear filters</a></div>
+    }
+</section>
+<div class="dashboard-footnote"><span>●</span> Student data refreshed from the placement office records.</div>

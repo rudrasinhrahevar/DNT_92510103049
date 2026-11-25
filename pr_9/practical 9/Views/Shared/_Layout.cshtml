@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <title>@ViewData["Title"] · Launchpad</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" asp-controller="Placement" asp-action="Index">
+            <span class="brand-mark">L</span>
+            launchpad<span class="brand-period">.</span>
+        </a>
+        <nav aria-label="Main navigation">
+            <a class="nav-link active" asp-controller="Placement" asp-action="Index">Dashboard</a>
+            <a class="nav-link" asp-controller="Placement" asp-action="Report">Reports</a>
+            <span class="term-chip"><span></span> PLACEMENTS 2026</span>
+        </nav>
+    </header>
+    <main class="page-shell">
+        @RenderBody()
+    </main>
+    <footer class="footer">LAUNCHPAD <span>·</span> Career outcomes, clearly in view.</footer>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

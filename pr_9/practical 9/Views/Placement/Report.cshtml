@@ -1,0 +1,78 @@
+@model PlacementDashboardViewModel
+@{
+    ViewData["Title"] = "Placement report";
+    var rate = Model.TotalStudents == 0 ? 0 : (int)Math.Round(Model.PlacedStudents * 100d / Model.TotalStudents);
+}
+
+<div class="report-toolbar no-print">
+    <a class="back-link" asp-action="Index">← Back to dashboard</a>
+    <div class="heading-actions">
+        <a class="button button-light" asp-action="ExportCsv" asp-route-search="@Model.Search" asp-route-status="@Model.Status" asp-route-department="@Model.Department">↓ Export CSV</a>
+        <button class="button button-dark" type="button" onclick="window.print()">Print report</button>
+    </div>
+</div>
+<article class="report-sheet">
+    <header class="report-header">
+        <div>
+            <div class="report-brand"><span class="brand-mark">L</span> LAUNCHPAD / CAREER SERVICES</div>
+            <h1>Placement outcomes report</h1>
+            <p>Graduating cohort · 2026</p>
+        </div>
+        <div class="report-date"><span>GENERATED</span><strong>@DateTime.Now.ToString("dd MMM yyyy")</strong><small>Placement office summary</small></div>
+    </header>
+    <div class="report-rule"></div>
+    <section class="report-kpis" aria-label="Report summary">
+        <div><span>STUDENTS TRACKED</span><strong>@Model.TotalStudents</strong></div>
+        <div><span>PLACED</span><strong>@Model.PlacedStudents <small>(@rate%)</small></strong></div>
+        <div><span>OFFERS IN HAND</span><strong>@Model.OfferCount</strong></div>
+        <div><span>AVERAGE PACKAGE</span><strong>₹@Model.AverageCtcLpa.ToString("0.0") <small>LPA</small></strong></div>
+    </section>
+    @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.Status) || !string.IsNullOrWhiteSpace(Model.Department))
+    {
+        <div class="report-filters">
+            FILTERS:
+            @if (!string.IsNullOrWhiteSpace(Model.Search)) { <span>Search: @Model.Search</span> }
+            @if (!string.IsNullOrWhiteSpace(Model.Department)) { <span>Department: @Model.Department</span> }
+            @if (!string.IsNullOrWhiteSpace(Model.Status)) { <span>Status: @Model.Status</span> }
+        </div>
+    }
+    <div class="report-section-heading"><div><span>01 / OUTCOMES</span><h2>Student placement register</h2></div><span>@Model.FilteredCount RECORDS</span></div>
+    <div class="table-wrap report-table-wrap">
+        <table>
+            <thead>
+                <tr><th>STUDENT ID</th><th>STUDENT</th><th>DEPARTMENT</th><th>COMPANY</th><th>ROLE</th><th>CTC (LPA)</th><th>STATUS</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var placement in Model.Placements)
+                {
+                    <tr>
+                        <td>@placement.StudentId</td><td class="report-student">@placement.StudentName</td><td>@placement.Department</td>
+                        <td>@placement.Company</td><td>@placement.Role</td><td>@(placement.CtcLpa?.ToString("0.0") ?? "—")</td><td>@placement.Status</td>
+                    </tr>
+                }
+                @if (Model.Placements.Count == 0)
+                {
+                    <tr><td colspan="7" class="report-empty">No records match the selected filters.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <section class="report-departments">
+        <div class="report-section-heading"><div><span>02 / DEPARTMENT SUMMARY</span><h2>Placement rate by department</h2></div></div>
+        <div class="department-report-grid">
+            @foreach (var department in Model.Departments)
+            {
+                <div><strong>@department.Name</strong><span>@department.PlacedCount of @department.StudentCount students placed</span><b>@department.PlacementRate%</b></div>
+            }
+        </div>
+    </section>
+    <footer class="report-footer"><span>LAUNCHPAD · PLACEMENT DASHBOARD</span><span>Confidential · For institutional use</span></footer>
+</article>
+
+@section Scripts {
+    <script>
+        if (new URLSearchParams(window.location.search).has("print")) {
+            window.print();
+        }
+    </script>
+}
