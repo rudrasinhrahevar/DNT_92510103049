@@ -1,0 +1,47 @@
+@model ServiceRequest
+@{
+    ViewData["Title"] = Model.Title;
+    var statusClass = Model.Status switch
+    {
+        ServiceRequestStatuses.InProgress => "progress",
+        ServiceRequestStatuses.Resolved => "resolved",
+        ServiceRequestStatuses.Cancelled => "cancelled",
+        _ => "submitted"
+    };
+}
+
+<a class="back-link" asp-action="Index">← All requests</a>
+<div class="detail-layout">
+    <article class="detail-card">
+        <div class="detail-topline"><span class="eyebrow dark-eyebrow">REQUEST #@Model.Id.ToString("D4")</span><span class="status-pill status-@statusClass">@Model.Status</span></div>
+        <h1>@Model.Title</h1>
+        <div class="detail-meta"><span>@Model.Category</span><span>·</span><span>@Model.Location</span><span>·</span><span class="priority priority-@Model.Priority.ToLowerInvariant()">@Model.Priority priority</span></div>
+        <div class="detail-divider"></div>
+        <h2>What happened</h2>
+        <p class="description">@Model.Description</p>
+        <div class="detail-divider"></div>
+        <h2>Submitted by</h2>
+        <p class="submitter"><strong>@Model.RequesterName</strong><a href="mailto:@Model.RequesterEmail">@Model.RequesterEmail</a></p>
+    </article>
+    <aside class="detail-aside">
+        <div class="aside-card"><div class="eyebrow dark-eyebrow">REQUEST ACTIVITY</div><div class="timeline">
+            <div class="timeline-item"><i class="timeline-dot done"></i><div><strong>Request submitted</strong><small>@Model.CreatedAt.ToString("MMMM d, yyyy 'at' h:mm tt")</small></div></div>
+            @if (Model.Status != ServiceRequestStatuses.Submitted)
+            {
+                <div class="timeline-item"><i class="timeline-dot active"></i><div><strong>Status: @Model.Status</strong><small>Last updated @Model.UpdatedAt.ToString("MMMM d, yyyy 'at' h:mm tt")</small></div></div>
+            }
+        </div></div>
+        <div class="aside-card"><div class="eyebrow dark-eyebrow">SERVICE TEAM</div><p class="team-name">@Model.Category</p><p class="muted">The relevant campus team has been notified. You can follow updates here.</p></div>
+        <div class="aside-card"><div class="eyebrow dark-eyebrow">UPDATE STATUS</div>
+            <form asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
+                <select name="status" aria-label="New status">
+                    @foreach (var status in ServiceRequestStatuses.All)
+                    {
+                        <option value="@status" selected="@(Model.Status == status)">@status</option>
+                    }
+                </select>
+                <button class="button button-dark full-button" type="submit">Save status</button>
+            </form>
+        </div>
+    </aside>
+</div>

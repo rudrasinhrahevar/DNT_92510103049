@@ -1,0 +1,67 @@
+@model ServiceRequestListViewModel
+@{
+    ViewData["Title"] = "Service requests";
+}
+
+<div class="page-heading">
+    <div><div class="eyebrow dark-eyebrow">CAMPUS SERVICE DESK</div><h1>Service requests</h1><p>Search and track reports from across campus.</p></div>
+    <a class="button button-primary" asp-action="Create"><span aria-hidden="true">+</span> New request</a>
+</div>
+
+<form class="filter-bar" method="get">
+    <label class="search-box"><span aria-hidden="true">⌕</span><input type="search" name="search" value="@Model.Search" placeholder="Search title, location, or requester" /></label>
+    <select name="status" aria-label="Filter by status">
+        <option value="">All statuses</option>
+        @foreach (var status in ServiceRequestStatuses.All)
+        {
+            <option value="@status" selected="@(Model.Status == status)">@status</option>
+        }
+    </select>
+    <button class="button button-dark" type="submit">Filter</button>
+    @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.Status))
+    {
+        <a class="clear-link" asp-action="Index">Clear</a>
+    }
+</form>
+
+<div class="list-summary"><strong>@Model.Requests.Count</strong> @(Model.Requests.Count == 1 ? "request" : "requests") found</div>
+@if (Model.Requests.Count == 0)
+{
+    <div class="empty-state compact-empty"><div class="empty-icon">⌕</div><h3>No matching requests</h3><p>Try a different search or submit a new request.</p><a class="text-link" asp-action="Create">Submit a request →</a></div>
+}
+else
+{
+    <div class="request-list">
+        @foreach (var request in Model.Requests)
+        {
+            <a class="request-row" asp-action="Details" asp-route-id="@request.Id">
+                <span class="category-icon">@CategoryIcon(request.Category)</span>
+                <span class="request-main"><strong>@request.Title</strong><small>@request.Category <span>·</span> @request.Location <span>·</span> @request.RequesterName</small></span>
+                <span class="priority priority-@request.Priority.ToLowerInvariant()">@request.Priority</span>
+                <span class="status-pill status-@StatusClass(request.Status)">@request.Status</span>
+                <span class="request-date">@request.CreatedAt.ToString("MMM d, yyyy")</span>
+                <span class="row-arrow" aria-hidden="true">→</span>
+            </a>
+        }
+    </div>
+}
+
+@functions {
+    private static string CategoryIcon(string category) => category switch
+    {
+        "Facilities" => "⌂",
+        "IT Support" => "⌘",
+        "Cleaning" => "✧",
+        "Transport" => "↗",
+        "Security" => "◈",
+        _ => "✳"
+    };
+
+    private static string StatusClass(string status) => status switch
+    {
+        ServiceRequestStatuses.InProgress => "progress",
+        ServiceRequestStatuses.Resolved => "resolved",
+        ServiceRequestStatuses.Cancelled => "cancelled",
+        _ => "submitted"
+    };
+}

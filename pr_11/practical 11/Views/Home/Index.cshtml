@@ -1,0 +1,76 @@
+@model CampusDashboardViewModel
+@{
+    ViewData["Title"] = "Campus services";
+}
+
+<section class="hero">
+    <div>
+        <div class="eyebrow"><span class="pulse"></span> SMART CAMPUS SERVICE PORTAL</div>
+        <h1>Campus, taken care of.</h1>
+        <p>One place to report an issue, request a service, and follow it through to resolution.</p>
+        <a class="button button-light" asp-controller="Requests" asp-action="Create">Submit a service request <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="building"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="art-dot dot-one"></div><div class="art-dot dot-two"></div>
+    </div>
+</section>
+
+<section class="stats" aria-label="Service request summary">
+    <article class="stat-card"><span class="stat-label">All requests</span><strong>@Model.TotalRequests</strong><span class="stat-note">Logged on campus</span></article>
+    <article class="stat-card"><span class="stat-label">Awaiting action</span><strong>@Model.OpenRequests</strong><span class="stat-note"><i class="status-dot submitted"></i> Submitted</span></article>
+    <article class="stat-card"><span class="stat-label">In progress</span><strong>@Model.InProgressRequests</strong><span class="stat-note"><i class="status-dot progress"></i> Being worked on</span></article>
+    <article class="stat-card"><span class="stat-label">Resolved</span><strong>@Model.ResolvedRequests</strong><span class="stat-note"><i class="status-dot resolved"></i> Completed</span></article>
+</section>
+
+<section class="section-heading">
+    <div><div class="eyebrow dark-eyebrow">KEEP AN EYE ON IT</div><h2>Recent requests</h2></div>
+    <a class="text-link" asp-controller="Requests" asp-action="Index">View all requests <span aria-hidden="true">→</span></a>
+</section>
+
+@if (Model.RecentRequests.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">✳</div>
+        <h3>A fresh start for campus.</h3>
+        <p>There are no requests yet. Let us know what needs attention.</p>
+        <a class="button button-primary" asp-controller="Requests" asp-action="Create">Create the first request</a>
+    </div>
+}
+else
+{
+    <div class="request-list">
+        @foreach (var request in Model.RecentRequests)
+        {
+            <a class="request-row" asp-controller="Requests" asp-action="Details" asp-route-id="@request.Id">
+                <span class="category-icon">@CategoryIcon(request.Category)</span>
+                <span class="request-main"><strong>@request.Title</strong><small>@request.Category <span>·</span> @request.Location</small></span>
+                <span class="priority priority-@request.Priority.ToLowerInvariant()">@request.Priority</span>
+                <span class="status-pill status-@StatusClass(request.Status)">@request.Status</span>
+                <span class="request-date">@request.CreatedAt.ToString("MMM d")</span>
+                <span class="row-arrow" aria-hidden="true">→</span>
+            </a>
+        }
+    </div>
+}
+
+@functions {
+    private static string CategoryIcon(string category) => category switch
+    {
+        "Facilities" => "⌂",
+        "IT Support" => "⌘",
+        "Cleaning" => "✧",
+        "Transport" => "↗",
+        "Security" => "◈",
+        _ => "✳"
+    };
+
+    private static string StatusClass(string status) => status switch
+    {
+        ServiceRequestStatuses.InProgress => "progress",
+        ServiceRequestStatuses.Resolved => "resolved",
+        ServiceRequestStatuses.Cancelled => "cancelled",
+        _ => "submitted"
+    };
+}
