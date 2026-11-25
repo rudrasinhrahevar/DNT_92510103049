@@ -1,0 +1,40 @@
+@model Product
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<a class="back-link" asp-action="Index">← Back to inventory</a>
+<section class="detail-card">
+    <div class="detail-heading">
+        <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> PRODUCT DETAILS</div>
+            <h1>@Model.Name</h1>
+            <span class="category-pill">@Model.Category</span>
+        </div>
+        @if (Model.IsLowStock)
+        {
+            <span class="stock-badge low">Low stock</span>
+        }
+        else
+        {
+            <span class="stock-badge healthy">In stock</span>
+        }
+    </div>
+    @if (TempData["Success"] is string message)
+    {
+        <div class="notice" role="status"><span>✓</span> @message</div>
+    }
+    <dl class="detail-grid">
+        <div><dt>SKU</dt><dd class="sku">@Model.Sku</dd></div>
+        <div><dt>UNIT PRICE</dt><dd>@Model.UnitPrice.ToString("C")</dd></div>
+        <div><dt>QUANTITY AVAILABLE</dt><dd>@Model.Quantity <small>units</small></dd></div>
+        <div><dt>REORDER LEVEL</dt><dd>@Model.ReorderLevel <small>units</small></dd></div>
+        <div><dt>SUPPLIER</dt><dd>@(string.IsNullOrWhiteSpace(Model.Supplier) ? "Not specified" : Model.Supplier)</dd></div>
+        <div><dt>STOCK VALUE</dt><dd>@((Model.Quantity * Model.UnitPrice).ToString("C"))</dd></div>
+    </dl>
+    <div class="detail-actions">
+        <a class="button button-dark" asp-action="Edit" asp-route-id="@Model.Id">Edit product</a>
+        <a class="button button-light" asp-action="Index">All products</a>
+        <a class="delete-link" asp-action="Delete" asp-route-id="@Model.Id">Delete product</a>
+    </div>
+</section>

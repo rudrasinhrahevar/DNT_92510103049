@@ -1,0 +1,15 @@
+@model ProductFormModel
+@{
+    ViewData["Title"] = "Add product";
+    ViewData["SubmitLabel"] = "Add to inventory";
+}
+
+<a class="back-link" asp-action="Index">← Back to inventory</a>
+<section class="form-page">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> NEW INVENTORY ITEM</div>
+    <h1>Add a <span>product.</span></h1>
+    <p class="form-intro">Enter the product details below. You can update these at any time.</p>
+    <form asp-action="Create" method="post" class="form-card">
+        <partial name="_ProductForm" model="Model" />
+    </form>
+</section>

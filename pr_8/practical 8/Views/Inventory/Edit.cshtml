@@ -1,0 +1,15 @@
+@model ProductFormModel
+@{
+    ViewData["Title"] = "Edit product";
+    ViewData["SubmitLabel"] = "Save changes";
+}
+
+<a class="back-link" asp-action="Index">← Back to inventory</a>
+<section class="form-page">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> UPDATE ITEM</div>
+    <h1>Edit <span>product.</span></h1>
+    <p class="form-intro">Adjust product details, stock levels, or supplier information.</p>
+    <form asp-action="Edit" asp-route-id="@ViewBag.ProductId" method="post" class="form-card">
+        <partial name="_ProductForm" model="Model" />
+    </form>
+</section>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f6f2" />
+    <title>@ViewData["Title"] · Stockroom</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" asp-controller="Inventory" asp-action="Index"><span class="brand-mark">S</span> stockroom<span class="brand-dot">.</span></a>
+        <nav aria-label="Main navigation">
+            <a class="nav-link active" asp-controller="Inventory" asp-action="Index">Inventory</a>
+            <a class="nav-add" asp-controller="Inventory" asp-action="Create"><span>+</span> Add product</a>
+        </nav>
+    </header>
+    <main class="page-shell">
+        @RenderBody()
+    </main>
+    <footer class="footer">Stockroom <span>·</span> Simple inventory, always in view.</footer>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

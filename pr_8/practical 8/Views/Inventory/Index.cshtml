@@ -1,0 +1,119 @@
+@model InventoryDashboardViewModel
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow"><span class="eyebrow-dot"></span> INVENTORY OVERVIEW</div>
+        <h1>Your stock, <span>at a glance.</span></h1>
+        <p>Keep track of products, quantities, and the details that keep your business moving.</p>
+    </div>
+    <a class="button button-dark" asp-action="Create"><span>+</span> Add product</a>
+</section>
+
+@if (TempData["Success"] is string message)
+{
+    <div class="notice" role="status"><span>✓</span> @message</div>
+}
+
+<section class="stats-grid" aria-label="Inventory summary">
+    <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon icon-lilac">▤</span><span class="stat-caption">ALL ITEMS</span></div>
+        <strong>@Model.TotalProducts</strong>
+        <span class="stat-description">unique products</span>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon icon-blue">▦</span><span class="stat-caption">UNITS IN STOCK</span></div>
+        <strong>@Model.TotalUnits.ToString("N0")</strong>
+        <span class="stat-description">across all products</span>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon icon-green">↗</span><span class="stat-caption">STOCK VALUE</span></div>
+        <strong>@Model.InventoryValue.ToString("C")</strong>
+        <span class="stat-description">total inventory value</span>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon icon-amber">!</span><span class="stat-caption">RESTOCK SOON</span></div>
+        <strong>@Model.LowStockCount</strong>
+        <span class="stat-description">at or below reorder level</span>
+    </article>
+</section>
+
+<section class="inventory-section">
+    <div class="section-heading">
+        <div>
+            <div class="eyebrow">PRODUCT CATALOG</div>
+            <h2>All products <span class="count">@Model.Products.Count</span></h2>
+        </div>
+        <form class="search-form" asp-action="Index" method="get">
+            <label class="sr-only" for="search">Search inventory</label>
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="search" type="search" name="search" value="@Model.Search" placeholder="Search products..." />
+            @if (!string.IsNullOrWhiteSpace(Model.Search))
+            {
+                <a class="clear-search" asp-action="Index" aria-label="Clear search">×</a>
+            }
+        </form>
+    </div>
+
+    @if (Model.Products.Count > 0)
+    {
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>PRODUCT</th>
+                        <th>SKU</th>
+                        <th>CATEGORY</th>
+                        <th>IN STOCK</th>
+                        <th>UNIT PRICE</th>
+                        <th>SUPPLIER</th>
+                        <th><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model.Products)
+                    {
+                        <tr>
+                            <td>
+                                <a class="product-name" asp-action="Details" asp-route-id="@product.Id">@product.Name</a>
+                                @if (product.IsLowStock)
+                                {
+                                    <span class="stock-badge low">Low stock</span>
+                                }
+                            </td>
+                            <td><span class="sku">@product.Sku</span></td>
+                            <td><span class="category-pill">@product.Category</span></td>
+                            <td><span class="quantity @(product.IsLowStock ? "quantity-low" : "")">@product.Quantity</span><span class="reorder-note"> / @product.ReorderLevel min</span></td>
+                            <td class="price">@product.UnitPrice.ToString("C")</td>
+                            <td class="supplier">@(string.IsNullOrWhiteSpace(product.Supplier) ? "—" : product.Supplier)</td>
+                            <td class="row-actions">
+                                <a asp-action="Edit" asp-route-id="@product.Id" aria-label="Edit @product.Name">Edit</a>
+                                <a class="action-delete" asp-action="Delete" asp-route-id="@product.Id" aria-label="Delete @product.Name">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <span class="empty-icon">⌕</span>
+            <h3>@(string.IsNullOrWhiteSpace(Model.Search) ? "Your inventory is empty" : "No products found")</h3>
+            <p>@(string.IsNullOrWhiteSpace(Model.Search) ? "Add your first product to start tracking stock." : "Try another search term or clear your search.")</p>
+            @if (string.IsNullOrWhiteSpace(Model.Search))
+            {
+                <a class="button button-dark" asp-action="Create">Add your first product</a>
+            }
+            else
+            {
+                <a class="button button-light" asp-action="Index">Clear search</a>
+            }
+        </div>
+    }
+</section>
+
+<div class="dashboard-footnote"><span>●</span> Inventory data is saved locally and ready whenever you are.</div>

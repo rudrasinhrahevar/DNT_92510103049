@@ -1,0 +1,45 @@
+@model ProductFormModel
+
+<div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+<div class="form-grid">
+    <div class="field">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" placeholder="e.g. Wireless Mouse" autocomplete="off" />
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Sku"></label>
+        <input asp-for="Sku" placeholder="e.g. EL-1001" autocomplete="off" />
+        <span asp-validation-for="Sku"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Category"></label>
+        <input asp-for="Category" placeholder="e.g. Electronics" autocomplete="off" />
+        <span asp-validation-for="Category"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Supplier"></label>
+        <input asp-for="Supplier" placeholder="Supplier name (optional)" autocomplete="organization" />
+        <span asp-validation-for="Supplier"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Quantity"></label>
+        <input asp-for="Quantity" min="0" inputmode="numeric" />
+        <span asp-validation-for="Quantity"></span>
+    </div>
+    <div class="field">
+        <label asp-for="ReorderLevel"></label>
+        <input asp-for="ReorderLevel" min="0" inputmode="numeric" />
+        <span asp-validation-for="ReorderLevel"></span>
+        <small>Get a low-stock flag at this quantity.</small>
+    </div>
+    <div class="field">
+        <label asp-for="UnitPrice"></label>
+        <div class="input-prefix"><span>$</span><input asp-for="UnitPrice" min="0.01" step="0.01" inputmode="decimal" /></div>
+        <span asp-validation-for="UnitPrice"></span>
+    </div>
+</div>
+<div class="form-actions">
+    <a class="button button-light" asp-action="Index">Cancel</a>
+    <button class="button button-dark" type="submit">@ViewData["SubmitLabel"]</button>
+</div>
